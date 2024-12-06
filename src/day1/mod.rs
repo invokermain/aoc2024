@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-pub fn parse_locations(file_contents: &str) -> (Vec<u32>, Vec<u32>) {
+fn parse_locations(file_contents: &str) -> (Vec<u32>, Vec<u32>) {
     let mut left = Vec::new();
     let mut right = Vec::new();
     let mut is_left = true;
@@ -18,7 +18,7 @@ pub fn parse_locations(file_contents: &str) -> (Vec<u32>, Vec<u32>) {
     (left, right)
 }
 
-pub fn calculate_total_distance(locations: &(Vec<u32>, Vec<u32>)) -> usize {
+fn calculate_total_distance(locations: &(Vec<u32>, Vec<u32>)) -> usize {
     locations
         .0
         .iter()
@@ -27,7 +27,7 @@ pub fn calculate_total_distance(locations: &(Vec<u32>, Vec<u32>)) -> usize {
         .sum()
 }
 
-pub fn calculate_similarity_score(locations: &(Vec<u32>, Vec<u32>)) -> usize {
+fn calculate_similarity_score(locations: &(Vec<u32>, Vec<u32>)) -> usize {
     let right_counts = locations
         .1
         .iter()

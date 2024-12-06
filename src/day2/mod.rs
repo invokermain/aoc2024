@@ -1,12 +1,15 @@
-pub fn parse_reports(file_contents: &str) -> Vec<Vec<i32>> {
-    Vec::from_iter(
-        file_contents
-            .split('\n')
-            .map(|line| Vec::from_iter(line.split_whitespace().map(|x| x.parse::<i32>().unwrap()))),
-    )
+fn parse_reports(file_contents: &str) -> Vec<Vec<i32>> {
+    file_contents
+        .split('\n')
+        .map(|line| {
+            line.split_whitespace()
+                .map(|x| x.parse::<i32>().unwrap())
+                .collect()
+        })
+        .collect()
 }
 
-pub fn is_safe(report: &[i32], dampener: bool) -> bool {
+fn is_safe(report: &[i32], dampener: bool) -> bool {
     let mut previous = report[0];
     let ascending = report[1] - report[0] > 0;
     for (current_index, &current) in report[1..].iter().enumerate() {
@@ -24,7 +27,7 @@ pub fn is_safe(report: &[i32], dampener: bool) -> bool {
     true
 }
 
-pub fn dampener_routine(current_index: usize, report: &[i32]) -> bool {
+fn dampener_routine(current_index: usize, report: &[i32]) -> bool {
     let mut right_report = report.to_owned();
     right_report.remove(current_index + 1); // we start from index 1
     let mut middle_report = report.to_owned();
@@ -40,7 +43,7 @@ pub fn dampener_routine(current_index: usize, report: &[i32]) -> bool {
         .any(|report| is_safe(report, false))
 }
 
-pub fn validate_level_change(ascending: bool, diff: i32) -> bool {
+fn validate_level_change(ascending: bool, diff: i32) -> bool {
     if ascending && diff <= 0 {
         return false;
     }
