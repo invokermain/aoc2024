@@ -1,5 +1,7 @@
 // Note grid here includes the \n character at the end of row
 
+use std::collections::HashMap;
+
 /// Special value to denote a break in the grid, e.g. a line break when parsing horizontally
 const BREAK: usize = usize::MAX;
 
@@ -10,11 +12,10 @@ struct Grid {
 }
 
 impl Grid {
-    fn count(&self) -> usize {
-        let mut count: usize = 0;
+    fn count_xmas_words(&self) -> usize {
         let str_bytes = self.values.as_bytes();
+        let mut counter = XmasCounter::default();
         for direction in GridDirection::values() {
-            let mut counter = XmasCounter::default();
             for str_index in direction.to_grid_iterator(self.width, self.height) {
                 if str_index == BREAK {
                     counter.break_count();
@@ -23,9 +24,24 @@ impl Grid {
                     counter.take(val);
                 }
             }
-            count += counter.count;
         }
-        count
+        counter.count
+    }
+    fn count_mas_crosses(&self) -> usize {
+        let str_bytes = self.values.as_bytes();
+        let mut detector = MasDetector::default();
+        for direction in [GridDirection::DiagonalA, GridDirection::DiagonalB] {
+            println!("direction: {direction:?}");
+            for str_index in direction.to_grid_iterator(self.width, self.height) {
+                if str_index == BREAK {
+                    detector.break_count();
+                } else {
+                    let val = str_bytes[str_index] as char;
+                    detector.take(val, str_index);
+                }
+            }
+        }
+        detector.count()
     }
 }
 
@@ -70,6 +86,62 @@ impl XmasCounter {
             }
             _ => 0,
         };
+    }
+
+    fn break_count(&mut self) {
+        self.forward_state = 0;
+        self.backward_state = 0;
+    }
+}
+
+#[derive(Default)]
+struct MasDetector {
+    detections: Vec<usize>,
+    forward_state: u8,
+    forward_index: usize,
+    backward_state: u8,
+    backward_index: usize,
+}
+
+impl MasDetector {
+    fn take(&mut self, c: char, idx: usize) {
+        self.forward_state = match (self.forward_state, c) {
+            (_, 'M') => 1,
+            (1, 'A') => {
+                self.forward_index = idx;
+                2
+            }
+            (2, 'S') => {
+                self.detections.push(self.forward_index);
+                0
+            }
+            _ => 0,
+        };
+        self.backward_state = match (self.backward_state, c) {
+            (_, 'S') => 1,
+            (1, 'A') => {
+                self.backward_index = idx;
+                2
+            }
+            (2, 'M') => {
+                self.detections.push(self.backward_index);
+                0
+            }
+            _ => 0,
+        }
+    }
+
+    fn count(&self) -> usize {
+        self.detections
+            .iter()
+            .fold(HashMap::<usize, usize>::new(), |mut map, &x| {
+                let entry = map.entry(x).or_default();
+                *entry += 1;
+                map
+            })
+            .iter()
+            .filter(|(_, &v)| v == 2)
+            .count()
     }
 
     fn break_count(&mut self) {
@@ -290,30 +362,47 @@ mod tests {
     fn test_grid_small() {
         let raw_grid = load_file(4, "input_test_4x4.txt");
         let grid = Grid::from(raw_grid.as_str());
-        let count = grid.count();
+        let count = grid.count_xmas_words();
         assert_eq!(count, 6);
+    }
+
+    #[test]
+    fn test_grid_small_mas() {
+        let raw_grid = load_file(4, "input_test_4x4.txt");
+        let grid = Grid::from(raw_grid.as_str());
+        let count = grid.count_mas_crosses();
+        assert_eq!(count, 2);
     }
 
     #[test]
     fn test_example_grid() {
         let raw_grid = load_file(4, "input_test.txt");
         let grid = Grid::from(raw_grid.as_str());
-        let count = grid.count();
+        let count = grid.count_xmas_words();
         assert_eq!(count, 18);
+    }
+
+    #[test]
+    fn test_example_grid_mas_cross() {
+        let raw_grid = load_file(4, "input_test.txt");
+        let grid = Grid::from(raw_grid.as_str());
+        let count = grid.count_mas_crosses();
+        assert_eq!(count, 9);
     }
 
     #[test]
     fn calculate_pt_1() {
         let raw_grid = load_input_for_day(4);
         let grid = Grid::from(raw_grid.as_str());
-        let count = grid.count();
+        let count = grid.count_xmas_words();
         assert_eq!(count, 2468);
     }
-    //
-    // #[test]
-    // fn calculate_pt_2() {
-    //     let file_contents = load_file_contents(4);
-    //     println!("val {:?}", true);
-    //     assert!(true);
-    // }
+
+    #[test]
+    fn calculate_pt_2() {
+        let raw_grid = load_input_for_day(4);
+        let grid = Grid::from(raw_grid.as_str());
+        let count = grid.count_mas_crosses();
+        assert_eq!(count, 1864);
+    }
 }
