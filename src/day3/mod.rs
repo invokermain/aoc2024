@@ -101,7 +101,7 @@ fn compute(input: &Vec<Operation>) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::load_file_contents;
+    use crate::utils::load_input_for_day;
 
     #[test]
     fn test_cleaning() {
@@ -150,7 +150,7 @@ mod tests {
 
     #[test]
     fn calculate_pt_1() {
-        let file_contents = load_file_contents(3);
+        let file_contents = load_input_for_day(3);
         let extracted = extract(file_contents.as_str())
             .into_iter()
             // part 1 just cares about Mul operator
@@ -167,7 +167,7 @@ mod tests {
 
     #[test]
     fn calculate_pt_2() {
-        let file_contents = load_file_contents(3);
+        let file_contents = load_input_for_day(3);
         let extracted = extract(file_contents.as_str());
         let total = compute(&extracted);
         println!("extracted: {extracted:?}");

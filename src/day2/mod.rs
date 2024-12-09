@@ -59,7 +59,7 @@ fn validate_level_change(ascending: bool, diff: i32) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::load_file_contents;
+    use crate::utils::load_input_for_day;
 
     #[test]
     fn test_parse_reports() {
@@ -96,7 +96,7 @@ mod tests {
 
     #[test]
     fn calculate_pt_1() {
-        let file_contents = load_file_contents(2);
+        let file_contents = load_input_for_day(2);
         let reports = parse_reports(file_contents.as_str());
         let total_safe: usize = reports
             .into_iter()
@@ -108,7 +108,7 @@ mod tests {
 
     #[test]
     fn calculate_pt_2() {
-        let file_contents = load_file_contents(2);
+        let file_contents = load_input_for_day(2);
         let reports = parse_reports(file_contents.as_str());
         let total_safe: usize = reports
             .into_iter()

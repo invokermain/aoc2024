@@ -47,7 +47,7 @@ fn calculate_similarity_score(locations: &(Vec<u32>, Vec<u32>)) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::utils::load_file_contents;
+    use crate::utils::load_input_for_day;
 
     #[test]
     fn test_parse_locations() {
@@ -72,7 +72,7 @@ mod tests {
 
     #[test]
     fn calculate_pt_1() {
-        let file_contents = load_file_contents(1);
+        let file_contents = load_input_for_day(1);
         let locations = parse_locations(file_contents.as_str());
         let total_distance = calculate_total_distance(&locations);
         println!("total distance is {total_distance:?}");
@@ -80,7 +80,7 @@ mod tests {
 
     #[test]
     fn calculate_pt_2() {
-        let file_contents = load_file_contents(1);
+        let file_contents = load_input_for_day(1);
         let locations = parse_locations(file_contents.as_str());
         let total_similarity = calculate_similarity_score(&locations);
         println!("total similarity is {total_similarity:?}");
