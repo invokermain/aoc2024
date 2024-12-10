@@ -28,21 +28,24 @@ impl PageUpdates {
         sum
     }
 
-    fn is_update_valid(&self, update: &Vec<usize>) -> bool {
+    fn is_update_valid(&self, update: &[usize]) -> bool {
         !update
             .iter()
             .tuple_combinations()
             .any(|(&l, &r)| self.rules.contains(&(r, l)))
     }
 
-    fn sort_update(&self, update: &Vec<usize>) -> Vec<usize> {
-        let mut sorted = update.clone();
-        while !self.is_update_valid(&sorted) {
+    fn sort_update(&self, update: &[usize]) -> Vec<usize> {
+        let mut sorted = update.to_owned();
+        let mut swap_in_pass = true;
+        while swap_in_pass {
+            swap_in_pass = false;
             for idx in (1..sorted.len()).rev() {
                 let r = sorted[idx];
                 let l = sorted[idx - 1];
                 if self.rules.contains(&(r, l)) {
                     sorted.swap(idx, idx - 1);
+                    swap_in_pass = true;
                 }
             }
         }
