@@ -16,7 +16,7 @@ impl Grid {
         let str_bytes = self.values.as_bytes();
         let mut counter = XmasCounter::default();
         for direction in GridDirection::values() {
-            for str_index in direction.to_grid_iterator(self.width, self.height) {
+            for str_index in direction.as_grid_iterator(self.width, self.height) {
                 if str_index == BREAK {
                     counter.break_count();
                 } else {
@@ -32,7 +32,7 @@ impl Grid {
         let mut detector = MasDetector::default();
         for direction in [GridDirection::DiagonalA, GridDirection::DiagonalB] {
             println!("direction: {direction:?}");
-            for str_index in direction.to_grid_iterator(self.width, self.height) {
+            for str_index in direction.as_grid_iterator(self.width, self.height) {
                 if str_index == BREAK {
                     detector.break_count();
                 } else {
@@ -50,7 +50,7 @@ impl From<&str> for Grid {
         let row_length = value.find('\n').unwrap_or_default();
         let row_count = (value.len() + 1) / (row_length + 1);
         Self {
-            values: value.replace("\n", ""),
+            values: value.replace('\n', ""),
             width: row_length,
             height: row_count,
         }
@@ -191,7 +191,7 @@ impl GridDirection {
     }
 
     /// returns an iterator over grid indexes to read, usize::MAX is used to denote a break
-    fn to_grid_iterator(&self, width: usize, height: usize) -> Box<dyn Iterator<Item = usize>> {
+    fn as_grid_iterator(self, width: usize, height: usize) -> Box<dyn Iterator<Item = usize>> {
         match self {
             GridDirection::Horizontal => {
                 let v_width = width + 1;
@@ -224,7 +224,7 @@ impl GridDirection {
                 Box::new(
                     (0..grid_len)
                         .map(move |idx| {
-                            let x = (-1 * (idx as i32) + (offset * (idx / v_height)) as i32)
+                            let x = (-(idx as i32) + (offset * (idx / v_height)) as i32)
                                 .rem_euclid(v_width as i32)
                                 as usize;
                             let y = idx % v_height;
@@ -290,7 +290,7 @@ mod tests {
     #[test]
     fn test_grid_direction_iterator_horizontal() {
         let grid_indexes = GridDirection::Horizontal
-            .to_grid_iterator(4, 2)
+            .as_grid_iterator(4, 2)
             .collect::<Vec<usize>>();
         assert_eq!(grid_indexes, vec![0, 1, 2, 3, BREAK, 4, 5, 6, 7, BREAK])
     }
@@ -298,7 +298,7 @@ mod tests {
     #[test]
     fn test_grid_direction_iterator_vertical() {
         let grid_indexes = GridDirection::Vertical
-            .to_grid_iterator(2, 4)
+            .as_grid_iterator(2, 4)
             .collect::<Vec<usize>>();
         assert_eq!(grid_indexes, vec![0, 2, 4, 6, BREAK, 1, 3, 5, 7, BREAK])
     }
@@ -306,7 +306,7 @@ mod tests {
     #[test]
     fn test_grid_direction_iterator_diagonal_a() {
         let grid_indexes = GridDirection::DiagonalA
-            .to_grid_iterator(4, 4)
+            .as_grid_iterator(4, 4)
             .collect::<Vec<usize>>();
         assert_eq!(
             grid_indexes,
@@ -320,7 +320,7 @@ mod tests {
     #[test]
     fn test_grid_direction_iterator_diagonal_a_2() {
         let grid_indexes = GridDirection::DiagonalA
-            .to_grid_iterator(3, 4)
+            .as_grid_iterator(3, 4)
             .collect::<Vec<usize>>();
         assert_eq!(
             grid_indexes,
@@ -331,7 +331,7 @@ mod tests {
     #[test]
     fn test_grid_direction_iterator_diagonal_b() {
         let grid_indexes = GridDirection::DiagonalB
-            .to_grid_iterator(4, 4)
+            .as_grid_iterator(4, 4)
             .collect::<Vec<usize>>();
         assert_eq!(
             grid_indexes,
