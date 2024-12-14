@@ -1,6 +1,8 @@
+#[allow(unused_variables)]
 fn calculate(input: &str) {}
 
 #[cfg(test)]
+#[allow(unused_variables)]
 mod tests {
     use crate::utils::load_input_for_day;
 
